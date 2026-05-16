@@ -24,13 +24,22 @@
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
     <style>
+        body {
+            background-color: #fce8f0;
+            min-height: 100vh;
+        }
+
         .auth-container {
-            max-width: 400px;
-            margin: 8rem auto;
-            background: var(--book-bg, #fff);
+            max-width: 420px;
+            margin: 6rem auto 3rem;
+            background: rgba(255, 255, 255, 0.92);
             padding: 3rem;
-            border-radius: 12px;
+            border-radius: 16px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
             text-align: center;
             border: 1px solid rgba(0, 0, 0, 0.05);
@@ -38,53 +47,141 @@
 
         .auth-input {
             width: 100%;
-            padding: 1rem;
+            padding: 0.9rem 1rem;
             margin-bottom: 1rem;
             border: 1px solid #ddd;
-            border-radius: 6px;
+            border-radius: 8px;
             font-family: 'Georgia', serif;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        .auth-input:focus {
+            outline: none;
+            border-color: #c2185b;
         }
 
         .auth-btn {
             width: 100%;
-            padding: 1rem;
+            padding: 0.95rem;
             background: #2c2c2c;
             color: #fff;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-family: 'Playfair Display', serif;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             transition: all 0.3s ease;
+            margin-top: 0.25rem;
         }
 
         .auth-btn:hover {
-            transform: scale(1.03);
-            background: #1e3a8a;
-            box-shadow: 0 8px 20px rgba(30, 58, 138, 0.3);
+            transform: scale(1.02);
+            background: #c2185b;
+            box-shadow: 0 8px 20px rgba(194, 24, 91, 0.3);
+        }
+
+        .auth-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 1.4rem 0;
+            color: #aaa;
+            font-size: 0.85rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e0e0e0;
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 0.85rem 1rem;
+            margin-bottom: 0.75rem;
+            border: 1.5px solid #ddd;
+            border-radius: 8px;
+            background: #fff;
+            font-size: 0.95rem;
+            font-family: 'Georgia', serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .social-btn:hover {
+            background: #fce8f0;
+            border-color: #c2185b;
+            transform: scale(1.01);
+        }
+
+        .social-btn img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .apple-btn {
+            background: #000;
+            color: #fff;
+            border-color: #000;
+        }
+
+        .apple-btn:hover {
+            background: #333;
+            border-color: #333;
         }
 
         .toggle-link {
             display: block;
             margin-top: 1.5rem;
-            color: #666;
+            color: #c2185b;
             font-size: 0.9rem;
             cursor: pointer;
             text-decoration: underline;
+            font-family: 'Georgia', serif;
+        }
+
+        .toggle-link:hover {
+            color: #880e4f;
         }
 
         #nameField {
             display: none;
         }
+
+        .error-msg {
+            color: #c62828;
+            font-size: 0.85rem;
+            margin-bottom: 0.75rem;
+            display: none;
+        }
+
+        .auth-logo {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
     </style>
 
     <link rel="icon" href="../assets/images/biblioDrift_favicon.png" type="image/png">
-
     <link rel="manifest" href="../manifest.json">
     <meta name="theme-color" content="#2c2420">
 </head>
 
-<body style="background: linear-gradient(to bottom right, #f8fafc, #dbeafe); min-height: 100vh;">
+<body>
 
     <header>
         <a href="index.html" class="logo">
@@ -98,12 +195,31 @@
     <main>
         <div class="auth-container">
 
+            <div class="auth-logo">🌸</div>
+
             <h2 id="authTitle"
-                style="font-family: 'Playfair Display'; margin-bottom: 2rem;">
+                style="font-family: 'Playfair Display'; margin-bottom: 1.8rem; color: #2c2420;">
                 Welcome Back
             </h2>
 
-            <form id="authForm">
+            <!-- Social Login Buttons -->
+            <button type="button" id="googleBtn" class="social-btn">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                Continue with Google
+            </button>
+
+            <button type="button" id="appleBtn" class="social-btn apple-btn">
+                <i class="fa-brands fa-apple" style="font-size:1.2rem;"></i>
+                Continue with Apple
+            </button>
+
+            <div class="divider">or use email</div>
+
+            <!-- Error message -->
+            <p class="error-msg" id="errorMsg"></p>
+
+            <!-- Email/Password Form -->
+            <form id="authForm" onsubmit="handleAuth(event)">
 
                 <div id="nameField">
                     <input type="text"
@@ -119,9 +235,11 @@
                     required>
 
                 <input type="password"
+                    id="password"
                     class="auth-input"
                     placeholder="Password"
-                    required>
+                    required
+                    minlength="6">
 
                 <button type="submit"
                     id="submitBtn"
@@ -140,16 +258,38 @@
         </div>
     </main>
 
+    <!-- Firebase config + Auth logic -->
     <script>
+        // -----------------------------------------------
+        // STEP 1: Paste your Firebase config here.
+        // Go to https://console.firebase.google.com
+        // → Your Project → Project Settings → Your Apps
+        // → Copy the firebaseConfig object and paste below.
+        // -----------------------------------------------
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // -----------------------------------------------
+        // Toggle between Sign In / Create Account
+        // -----------------------------------------------
         const toggleText = document.getElementById('toggleText');
-        const authForm = document.getElementById('authForm');
-        const authTitle = document.getElementById('authTitle');
-        const nameField = document.getElementById('nameField');
-        const submitBtn = document.getElementById('submitBtn');
+        const authForm   = document.getElementById('authForm');
+        const authTitle  = document.getElementById('authTitle');
+        const nameField  = document.getElementById('nameField');
+        const submitBtn  = document.getElementById('submitBtn');
+        const errorMsg   = document.getElementById('errorMsg');
 
         toggleText.addEventListener('click', () => {
             const isLogin = authForm.dataset.mode !== 'register';
-
             if (isLogin) {
                 authForm.dataset.mode = 'register';
                 authTitle.textContent = 'Create Account';
@@ -163,9 +303,158 @@
                 submitBtn.textContent = 'Sign In';
                 toggleText.textContent = 'No account? Create one.';
             }
+            hideError();
+        });
+
+        // -----------------------------------------------
+        // Helpers
+        // -----------------------------------------------
+        function showError(msg) {
+            errorMsg.textContent = msg;
+            errorMsg.style.display = 'block';
+        }
+
+        function hideError() {
+            errorMsg.textContent = '';
+            errorMsg.style.display = 'none';
+        }
+
+        function setLoading(btn, loading) {
+            btn.disabled = loading;
+            if (loading) {
+                btn.dataset.original = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Please wait...';
+            } else {
+                btn.innerHTML = btn.dataset.original || btn.innerHTML;
+            }
+        }
+
+        function onLoginSuccess(user) {
+            // Save user info to localStorage for the rest of the app
+            const userData = {
+                id: user.uid,
+                username: user.displayName || user.email.split('@')[0],
+                email: user.email,
+                photoURL: user.photoURL || null
+            };
+            localStorage.setItem('bibliodrift_user', JSON.stringify(userData));
+            localStorage.setItem('isLoggedIn', 'true');
+            window.location.href = 'library.html';
+        }
+
+        // -----------------------------------------------
+        // Google Sign In
+        // -----------------------------------------------
+        document.getElementById('googleBtn').addEventListener('click', async () => {
+            hideError();
+            const btn = document.getElementById('googleBtn');
+            setLoading(btn, true);
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                const result = await auth.signInWithPopup(provider);
+                onLoginSuccess(result.user);
+            } catch (err) {
+                setLoading(btn, false);
+                showError(getFriendlyError(err.code));
+            }
+        });
+
+        // -----------------------------------------------
+        // Apple Sign In
+        // -----------------------------------------------
+        document.getElementById('appleBtn').addEventListener('click', async () => {
+            hideError();
+            const btn = document.getElementById('appleBtn');
+            setLoading(btn, true);
+            try {
+                const provider = new firebase.auth.OAuthProvider('apple.com');
+                provider.addScope('email');
+                provider.addScope('name');
+                const result = await auth.signInWithPopup(provider);
+                onLoginSuccess(result.user);
+            } catch (err) {
+                setLoading(btn, false);
+                showError(getFriendlyError(err.code));
+            }
+        });
+
+        // -----------------------------------------------
+        // Email / Password Auth
+        // -----------------------------------------------
+        async function handleAuth(event) {
+            event.preventDefault();
+            hideError();
+
+            const mode     = authForm.dataset.mode || 'login';
+            const email    = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            // Basic validation
+            if (!email || !password) {
+                showError('Please fill in all fields.');
+                return;
+            }
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters.');
+                return;
+            }
+
+            setLoading(submitBtn, true);
+
+            try {
+                let result;
+
+                if (mode === 'register') {
+                    // Create new account
+                    result = await auth.createUserWithEmailAndPassword(email, password);
+
+                    // Set display name if provided
+                    const usernameInput = document.getElementById('username');
+                    if (usernameInput && usernameInput.value.trim()) {
+                        await result.user.updateProfile({
+                            displayName: usernameInput.value.trim()
+                        });
+                    }
+                } else {
+                    // Sign in existing account
+                    result = await auth.signInWithEmailAndPassword(email, password);
+                }
+
+                onLoginSuccess(result.user);
+
+            } catch (err) {
+                setLoading(submitBtn, false);
+                showError(getFriendlyError(err.code));
+            }
+        }
+
+        // -----------------------------------------------
+        // Friendly Firebase error messages
+        // -----------------------------------------------
+        function getFriendlyError(code) {
+            const errors = {
+                'auth/user-not-found':        'No account found with this email.',
+                'auth/wrong-password':         'Incorrect password. Please try again.',
+                'auth/email-already-in-use':   'This email is already registered. Try signing in.',
+                'auth/weak-password':          'Password must be at least 6 characters.',
+                'auth/invalid-email':          'Please enter a valid email address.',
+                'auth/too-many-requests':      'Too many attempts. Please try again later.',
+                'auth/network-request-failed': 'Network error. Check your connection.',
+                'auth/popup-closed-by-user':   'Sign-in was cancelled.',
+                'auth/cancelled-popup-request':'Sign-in was cancelled.',
+            };
+            return errors[code] || 'Something went wrong. Please try again.';
+        }
+
+        // -----------------------------------------------
+        // If already logged in, redirect away
+        // -----------------------------------------------
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                window.location.href = 'library.html';
+            }
         });
     </script>
 
 </body>
-
 </html>

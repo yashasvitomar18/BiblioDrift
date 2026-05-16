@@ -56,7 +56,14 @@ html {
 }
 
 body {
-    background-color: var(--bg-color);
+
+  background-color: #fce8f0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3C!-- stem --%3E%3Cline x1='110' y1='190' x2='110' y2='120' stroke='%23a0522d' stroke-width='1.5'/%3E%3C!-- leaves --%3E%3Cellipse cx='98' cy='160' rx='12' ry='5' fill='%23d8b6c6' transform='rotate(-30 98 160)'/%3E%3Cellipse cx='122' cy='150' rx='12' ry='5' fill='%23d8b6c6' transform='rotate(30 122 150)'/%3E%3C!-- petals --%3E%3Cellipse cx='110' cy='120' rx='11' ry='20' fill='%23f8bbd0'/%3E%3Cellipse cx='100' cy='123' rx='9' ry='18' fill='%23ffd6e7'/%3E%3Cellipse cx='120' cy='123' rx='9' ry='18' fill='%23f48fb1'/%3E%3Cellipse cx='110' cy='106' rx='6' ry='10' fill='%23fff0f5' opacity='0.5'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 300px 300px;
+  background-attachment: fixed;
+
     color: var(--text-main);
     font-family: "Georgia", serif;
     /* Classic serif for books */
